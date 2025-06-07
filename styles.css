@@ -47,8 +47,8 @@ body {
     right: 0;
     z-index: 9999;
     display: flex;
-    justify-content: center;
-    gap: 20px;
+    justify-content: space-between;
+    gap: 10px;
     padding: 10px;
     background-color: rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(10px);
@@ -61,7 +61,7 @@ body {
 }
 
 .btn {
-    padding: 15px 30px;
+    padding: 12px 10px;
     border: none;
     border-radius: 25px;
     background-color: #007AFF;
@@ -78,11 +78,12 @@ body {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 100%;
-    min-width: 0;
     flex: 1;
     text-align: center;
     line-height: 1.2;
+    min-width: 0;
+    max-width: none;
+    font-size: clamp(12px, 4vw, 16px);
 }
 
 .btn:disabled {
@@ -100,28 +101,24 @@ body {
     .controls {
         padding: 15px;
         bottom: env(safe-area-inset-bottom, 20px);
-        gap: 10px;
+        gap: 8px;
     }
 
     .btn {
-        padding: 12px 20px;
-        font-size: 14px;
-        min-width: 80px;
-        max-width: 120px;
+        padding: 10px 8px;
+        font-size: clamp(10px, 3.5vw, 14px);
     }
 }
 
 @media (max-width: 360px) {
     .controls {
-        gap: 8px;
+        gap: 6px;
         padding: 10px;
     }
 
     .btn {
-        padding: 10px 15px;
-        font-size: 12px;
-        min-width: 70px;
-        max-width: 100px;
+        padding: 8px 6px;
+        font-size: clamp(8px, 3vw, 12px);
     }
 }
 

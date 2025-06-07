@@ -24,8 +24,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             controls.style.right = '0';
             controls.style.zIndex = '9999';
             controls.style.display = 'flex';
-            controls.style.justifyContent = 'center';
-            controls.style.gap = '20px';
+            controls.style.justifyContent = 'space-between';
+            controls.style.gap = '10px';
             controls.style.padding = '10px';
             controls.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
             controls.style.backdropFilter = 'blur(10px)';
@@ -43,11 +43,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             // 根據屏幕寬度調整間距
             if (window.innerWidth <= 768) {
-                controls.style.gap = '10px';
+                controls.style.gap = '8px';
                 controls.style.padding = '15px';
             }
             if (window.innerWidth <= 360) {
-                controls.style.gap = '8px';
+                controls.style.gap = '6px';
                 controls.style.padding = '10px';
             }
         }
@@ -56,12 +56,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         const buttons = [startButton, takePhotoButton, savePhotoButton];
         buttons.forEach(button => {
             if (button) {
-                button.style.padding = '15px 30px';
+                button.style.padding = '12px 10px';
                 button.style.border = 'none';
                 button.style.borderRadius = '25px';
                 button.style.backgroundColor = '#007AFF';
                 button.style.color = 'white';
-                button.style.fontSize = '16px';
+                button.style.fontSize = 'clamp(12px, 4vw, 16px)';
                 button.style.fontWeight = '600';
                 button.style.cursor = 'pointer';
                 button.style.transition = 'all 0.3s ease';
@@ -74,24 +74,20 @@ document.addEventListener('DOMContentLoaded', async () => {
                 button.style.whiteSpace = 'nowrap';
                 button.style.overflow = 'hidden';
                 button.style.textOverflow = 'ellipsis';
-                button.style.maxWidth = '100%';
-                button.style.minWidth = '0';
                 button.style.flex = '1';
                 button.style.textAlign = 'center';
                 button.style.lineHeight = '1.2';
+                button.style.minWidth = '0';
+                button.style.maxWidth = 'none';
 
                 // 根據屏幕寬度調整按鈕大小
                 if (window.innerWidth <= 768) {
-                    button.style.padding = '12px 20px';
-                    button.style.fontSize = '14px';
-                    button.style.minWidth = '80px';
-                    button.style.maxWidth = '120px';
+                    button.style.padding = '10px 8px';
+                    button.style.fontSize = 'clamp(10px, 3.5vw, 14px)';
                 }
                 if (window.innerWidth <= 360) {
-                    button.style.padding = '10px 15px';
-                    button.style.fontSize = '12px';
-                    button.style.minWidth = '70px';
-                    button.style.maxWidth = '100px';
+                    button.style.padding = '8px 6px';
+                    button.style.fontSize = 'clamp(8px, 3vw, 12px)';
                 }
             }
         });
