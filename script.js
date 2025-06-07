@@ -9,11 +9,34 @@ document.addEventListener('DOMContentLoaded', async () => {
     let stream = null;
     let cameraSettings = null;
     let actualResolution = null;
+    let screenResolution = {
+        width: window.innerWidth,
+        height: window.innerHeight
+    };
 
     // 檢測瀏覽器類型
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
     const isAndroid = /Android/.test(navigator.userAgent);
     const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+
+    // 更新屏幕分辨率
+    function updateScreenResolution() {
+        screenResolution = {
+            width: window.innerWidth,
+            height: window.innerHeight
+        };
+        // 更新視頻元素尺寸
+        if (video) {
+            video.style.width = `${screenResolution.width}px`;
+            video.style.height = `${screenResolution.height}px`;
+        }
+    }
+
+    // 監聽屏幕方向變化
+    window.addEventListener('resize', updateScreenResolution);
+    window.addEventListener('orientationchange', () => {
+        setTimeout(updateScreenResolution, 100);
+    });
 
     // 獲取相機實際分辨率
     async function getActualCameraResolution() {
@@ -166,6 +189,15 @@ document.addEventListener('DOMContentLoaded', async () => {
             video.setAttribute('webkit-playsinline', true);
             video.setAttribute('autoplay', true);
 
+            // 設置視頻元素樣式
+            video.style.width = `${screenResolution.width}px`;
+            video.style.height = `${screenResolution.height}px`;
+            video.style.objectFit = 'cover';
+            video.style.position = 'fixed';
+            video.style.top = '0';
+            video.style.left = '0';
+            video.style.zIndex = '1';
+
             // 等待視頻加載
             await new Promise((resolve) => {
                 video.onloadedmetadata = () => {
@@ -229,6 +261,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         // 將 canvas 轉換為高質量圖片
         photo.src = canvas.toDataURL('image/jpeg', 1.0);
         photo.style.display = 'block';
+        photo.style.width = `${screenResolution.width}px`;
+        photo.style.height = `${screenResolution.height}px`;
+        photo.style.objectFit = 'cover';
+        photo.style.position = 'fixed';
+        photo.style.top = '0';
+        photo.style.left = '0';
+        photo.style.zIndex = '1';
         video.style.display = 'none';
 
         takePhotoButton.disabled = true;
