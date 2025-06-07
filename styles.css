@@ -97,6 +97,7 @@ body {
     -webkit-transform: scale(0.95);
 }
 
+/* 平板和手機螢幕適配 */
 @media (max-width: 768px) {
     .controls {
         padding: 15px;
@@ -110,6 +111,7 @@ body {
     }
 }
 
+/* 小螢幕手機適配 */
 @media (max-width: 360px) {
     .controls {
         gap: 6px;
@@ -122,7 +124,7 @@ body {
     }
 }
 
-/* iOS 安全区域适配 */
+/* iOS 安全區域適配 */
 @supports (padding: max(0px)) {
     .controls {
         padding-bottom: max(15px, env(safe-area-inset-bottom));

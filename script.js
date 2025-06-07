@@ -286,18 +286,18 @@ document.addEventListener('DOMContentLoaded', async () => {
             stream = await navigator.mediaDevices.getUserMedia(constraints);
             video.srcObject = stream;
 
-            // 等待視頻加載
+            // 等待影片加載
             await new Promise((resolve) => {
                 video.onloadedmetadata = () => {
                     resolve();
                 };
             });
 
-            // 播放視頻
+            // 播放影片
             try {
                 await video.play();
             } catch (err) {
-                console.error('視頻播放失敗:', err);
+                console.error('影片播放失敗:', err);
                 video.play().catch(e => console.error('舊版播放失敗:', e));
             }
 
@@ -377,18 +377,18 @@ document.addEventListener('DOMContentLoaded', async () => {
             video.style.left = '0';
             video.style.zIndex = '1';
 
-            // 等待視頻加載
+            // 等待影片加載
             await new Promise((resolve) => {
                 video.onloadedmetadata = () => {
                     resolve();
                 };
             });
 
-            // 播放視頻
+            // 播放影片
             try {
                 await video.play();
             } catch (err) {
-                console.error('視頻播放失敗:', err);
+                console.error('影片播放失敗:', err);
                 video.play().catch(e => console.error('舊版播放失敗:', e));
             }
 
