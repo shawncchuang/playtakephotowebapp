@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const startButton = document.getElementById('startCamera');
     const takePhotoButton = document.getElementById('takePhoto');
     const savePhotoButton = document.getElementById('savePhoto');
+    const controls = document.querySelector('.controls');
 
     let stream = null;
     let cameraSettings = null;
@@ -13,6 +14,41 @@ document.addEventListener('DOMContentLoaded', async () => {
         width: window.innerWidth,
         height: window.innerHeight
     };
+
+    // 設置控制按鈕樣式
+    function setupControlsStyle() {
+        if (controls) {
+            controls.style.position = 'fixed';
+            controls.style.bottom = '20px';
+            controls.style.left = '0';
+            controls.style.right = '0';
+            controls.style.zIndex = '1000';
+            controls.style.display = 'flex';
+            controls.style.justifyContent = 'center';
+            controls.style.gap = '20px';
+            controls.style.padding = '10px';
+            controls.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+            controls.style.backdropFilter = 'blur(10px)';
+            controls.style.webkitBackdropFilter = 'blur(10px)';
+        }
+
+        // 設置按鈕樣式
+        const buttons = [startButton, takePhotoButton, savePhotoButton];
+        buttons.forEach(button => {
+            if (button) {
+                button.style.padding = '15px 30px';
+                button.style.border = 'none';
+                button.style.borderRadius = '25px';
+                button.style.backgroundColor = '#007AFF';
+                button.style.color = 'white';
+                button.style.fontSize = '16px';
+                button.style.fontWeight = '600';
+                button.style.cursor = 'pointer';
+                button.style.transition = 'all 0.3s ease';
+                button.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.2)';
+            }
+        });
+    }
 
     // 檢測瀏覽器類型
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
@@ -247,6 +283,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             alert('無法訪問相機，請確保已授予相機權限。');
         }
     }
+
+    // 設置控制按鈕樣式
+    setupControlsStyle();
 
     // 自動啟動相機
     startCamera();

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>TakePhotoWebApp</title>
+    <title>相機應用</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 
@@ -13,13 +13,13 @@
         <div class="camera-container">
             <video id="video" autoplay playsinline></video>
             <canvas id="canvas" style="display: none;"></canvas>
-            <img id="photo" alt="拍摄的照片">
+            <img id="photo" style="display: none;">
         </div>
 
         <div class="controls">
             <button id="startCamera" class="btn">開啟相機</button>
             <button id="takePhoto" class="btn" disabled>拍照</button>
-            <button id="savePhoto" class="btn" disabled>保存到相簿</button>
+            <button id="savePhoto" class="btn" disabled>儲存照片</button>
         </div>
     </div>
     <script src="script.js"></script>
