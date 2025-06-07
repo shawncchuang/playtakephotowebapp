@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             controls.style.bottom = '20px';
             controls.style.left = '0';
             controls.style.right = '0';
-            controls.style.zIndex = '1000';
+            controls.style.zIndex = '9999';
             controls.style.display = 'flex';
             controls.style.justifyContent = 'center';
             controls.style.gap = '20px';
@@ -30,6 +30,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             controls.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
             controls.style.backdropFilter = 'blur(10px)';
             controls.style.webkitBackdropFilter = 'blur(10px)';
+            controls.style.transform = 'translateZ(0)';
+            controls.style.webkitTransform = 'translateZ(0)';
+
+            // 適配 iOS 安全區域
+            if (isIOS) {
+                controls.style.paddingBottom = 'max(15px, env(safe-area-inset-bottom))';
+            }
         }
 
         // 設置按鈕樣式
@@ -46,6 +53,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                 button.style.cursor = 'pointer';
                 button.style.transition = 'all 0.3s ease';
                 button.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.2)';
+                button.style.webkitAppearance = 'none';
+                button.style.appearance = 'none';
+                button.style.position = 'relative';
+                button.style.zIndex = '10000';
+                button.style.webkitTapHighlightColor = 'transparent';
             }
         });
     }
@@ -65,6 +77,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (video) {
             video.style.width = `${screenResolution.width}px`;
             video.style.height = `${screenResolution.height}px`;
+            video.style.zIndex = '1';
         }
     }
 
