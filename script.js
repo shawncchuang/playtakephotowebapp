@@ -44,7 +44,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             // 先獲取一個臨時串流來檢查實際分辨率
             const tempStream = await navigator.mediaDevices.getUserMedia({
                 video: {
-                    facingMode: 'environment'
+                    facingMode: 'environment',
+                    width: { ideal: 4096 },
+                    height: { ideal: 2160 }
                 }
             });
 
@@ -54,6 +56,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             // 停止臨時串流
             tempStream.getTracks().forEach(track => track.stop());
 
+            console.log('相機實際分辨率:', settings.width, 'x', settings.height);
             return {
                 width: settings.width,
                 height: settings.height
@@ -73,7 +76,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                     // 在 iOS 上，直接請求相機權限
                     const tempStream = await navigator.mediaDevices.getUserMedia({
                         video: {
-                            facingMode: 'environment'
+                            facingMode: 'environment',
+                            width: { ideal: 4096 },
+                            height: { ideal: 2160 }
                         }
                     });
                     // 立即停止臨時串流
@@ -110,8 +115,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (isIOS && isSafari) {
                 return {
                     facingMode: 'environment',
-                    width: actualResolution?.width || 1280,
-                    height: actualResolution?.height || 720
+                    width: actualResolution?.width || 1920,
+                    height: actualResolution?.height || 1080
                 };
             }
 
@@ -135,8 +140,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             console.error('獲取相機設置失敗:', err);
             return {
                 facingMode: 'environment',
-                width: actualResolution?.width || 1280,
-                height: actualResolution?.height || 720
+                width: actualResolution?.width || 1920,
+                height: actualResolution?.height || 1080
             };
         }
     }
