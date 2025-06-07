@@ -107,7 +107,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             width: window.innerWidth,
             height: window.innerHeight
         };
-        // 更新視頻元素尺寸
+        // 更新影片元素尺寸
         if (video) {
             video.style.width = `${screenResolution.width}px`;
             video.style.height = `${screenResolution.height}px`;
@@ -195,7 +195,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             actualResolution = await getActualCameraResolution();
             console.log('相機實際分辨率:', actualResolution);
 
-            // 獲取所有可用的視頻輸入設備
+            // 獲取所有可用的影片輸入設備
             const devices = await navigator.mediaDevices.enumerateDevices();
             const videoDevices = devices.filter(device => device.kind === 'videoinput');
 
@@ -362,13 +362,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             stream = await navigator.mediaDevices.getUserMedia(constraints);
 
-            // 設置視頻元素
+            // 設置影片元素
             video.srcObject = stream;
             video.setAttribute('playsinline', true);
             video.setAttribute('webkit-playsinline', true);
             video.setAttribute('autoplay', true);
 
-            // 設置視頻元素樣式
+            // 設置影片元素樣式
             video.style.width = `${screenResolution.width}px`;
             video.style.height = `${screenResolution.height}px`;
             video.style.objectFit = 'cover';
