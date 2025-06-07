@@ -8,11 +8,38 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     let stream = null;
     let cameraSettings = null;
+    let actualResolution = null;
 
     // 檢測瀏覽器類型
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
     const isAndroid = /Android/.test(navigator.userAgent);
     const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+
+    // 獲取相機實際分辨率
+    async function getActualCameraResolution() {
+        try {
+            // 先獲取一個臨時串流來檢查實際分辨率
+            const tempStream = await navigator.mediaDevices.getUserMedia({
+                video: {
+                    facingMode: 'environment'
+                }
+            });
+
+            const videoTrack = tempStream.getVideoTracks()[0];
+            const settings = videoTrack.getSettings();
+
+            // 停止臨時串流
+            tempStream.getTracks().forEach(track => track.stop());
+
+            return {
+                width: settings.width,
+                height: settings.height
+            };
+        } catch (err) {
+            console.error('獲取相機分辨率失敗:', err);
+            return null;
+        }
+    }
 
     // 檢查並請求權限
     async function requestPermissions() {
@@ -53,12 +80,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 獲取相機最佳設置
     async function getBestCameraSettings() {
         try {
+            // 獲取實際分辨率
+            actualResolution = await getActualCameraResolution();
+
             // iOS Safari 特殊處理
             if (isIOS && isSafari) {
                 return {
                     facingMode: 'environment',
-                    width: { ideal: 1280 },
-                    height: { ideal: 720 }
+                    width: actualResolution?.width || 1280,
+                    height: actualResolution?.height || 720
                 };
             }
 
@@ -72,30 +102,18 @@ document.addEventListener('DOMContentLoaded', async () => {
                 device.label.toLowerCase().includes('rear')
             ) || videoDevices[0];
 
-            // 獲取相機能力
-            const stream = await navigator.mediaDevices.getUserMedia({
-                video: {
-                    deviceId: backCamera.deviceId,
-                    facingMode: 'environment'
-                }
-            });
-            const track = stream.getVideoTracks()[0];
-            const capabilities = track.getCapabilities();
-
-            // 停止臨時串流
-            stream.getTracks().forEach(track => track.stop());
-
             return {
                 deviceId: backCamera.deviceId,
-                width: capabilities.width?.max || 1920,
-                height: capabilities.height?.max || 1080
+                width: actualResolution?.width || 1920,
+                height: actualResolution?.height || 1080,
+                facingMode: 'environment'
             };
         } catch (err) {
             console.error('獲取相機設置失敗:', err);
             return {
                 facingMode: 'environment',
-                width: { ideal: 1280 },
-                height: { ideal: 720 }
+                width: actualResolution?.width || 1280,
+                height: actualResolution?.height || 720
             };
         }
     }
@@ -114,8 +132,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             const constraints = {
                 video: {
                     facingMode: 'environment',
-                    width: { ideal: 1280 },
-                    height: { ideal: 720 }
+                    width: { exact: actualResolution?.width },
+                    height: { exact: actualResolution?.height }
                 }
             };
 
@@ -123,14 +141,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (isIOS && isSafari) {
                 constraints.video = {
                     facingMode: 'environment',
-                    width: { ideal: 1280 },
-                    height: { ideal: 720 }
+                    width: { exact: actualResolution?.width },
+                    height: { exact: actualResolution?.height }
                 };
             } else {
                 constraints.video = {
                     deviceId: cameraSettings.deviceId,
-                    width: { ideal: cameraSettings.width },
-                    height: { ideal: cameraSettings.height },
+                    width: { exact: actualResolution?.width },
+                    height: { exact: actualResolution?.height },
                     facingMode: 'environment'
                 };
             }
@@ -206,7 +224,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const ctx = canvas.getContext('2d', { alpha: false });
         ctx.imageSmoothingEnabled = true;
         ctx.imageSmoothingQuality = 'high';
-        ctx.drawImage(video, 0, 0);
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
         // 將 canvas 轉換為高質量圖片
         photo.src = canvas.toDataURL('image/jpeg', 1.0);
