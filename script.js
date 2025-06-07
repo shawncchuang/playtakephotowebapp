@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const canvas = document.getElementById('canvas');
     const photo = document.getElementById('photo');
     const startButton = document.getElementById('startCamera');
+    const switchButton = document.getElementById('switchCamera');
     const takePhotoButton = document.getElementById('takePhoto');
     const savePhotoButton = document.getElementById('savePhoto');
     const controls = document.querySelector('.controls');
@@ -14,6 +15,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         width: window.innerWidth,
         height: window.innerHeight
     };
+    let currentFacingMode = 'environment';
+    let availableCameras = [];
 
     // 設置控制按鈕樣式
     function setupControlsStyle() {
@@ -53,7 +56,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         // 設置按鈕樣式
-        const buttons = [startButton, takePhotoButton, savePhotoButton];
+        const buttons = [startButton, switchButton, takePhotoButton, savePhotoButton];
         buttons.forEach(button => {
             if (button) {
                 button.style.padding = '12px 10px';
@@ -246,6 +249,73 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
+    // 獲取所有可用的相機
+    async function getAvailableCameras() {
+        try {
+            const devices = await navigator.mediaDevices.enumerateDevices();
+            availableCameras = devices.filter(device => device.kind === 'videoinput');
+            console.log('可用相機:', availableCameras);
+            return availableCameras.length > 1;
+        } catch (err) {
+            console.error('獲取相機列表失敗:', err);
+            return false;
+        }
+    }
+
+    // 切換相機
+    async function switchCamera() {
+        try {
+            // 停止當前串流
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+
+            // 切換 facingMode
+            currentFacingMode = currentFacingMode === 'environment' ? 'user' : 'environment';
+
+            // 設置新的約束條件
+            const constraints = {
+                video: {
+                    facingMode: currentFacingMode,
+                    width: { exact: actualResolution?.width },
+                    height: { exact: actualResolution?.height }
+                }
+            };
+
+            // 獲取新的串流
+            stream = await navigator.mediaDevices.getUserMedia(constraints);
+            video.srcObject = stream;
+
+            // 等待視頻加載
+            await new Promise((resolve) => {
+                video.onloadedmetadata = () => {
+                    resolve();
+                };
+            });
+
+            // 播放視頻
+            try {
+                await video.play();
+            } catch (err) {
+                console.error('視頻播放失敗:', err);
+                video.play().catch(e => console.error('舊版播放失敗:', e));
+            }
+
+            // 設置自動對焦
+            const track = stream.getVideoTracks()[0];
+            if (track.getCapabilities().focusMode) {
+                track.applyConstraints({
+                    advanced: [{
+                        focusMode: 'continuous'
+                    }]
+                }).catch(err => console.log('自動對焦設置失敗:', err));
+            }
+        } catch (err) {
+            console.error('切換相機失敗:', err);
+            alert('切換相機失敗，請重試。');
+        }
+    }
+
     // 啟動相機
     async function startCamera() {
         try {
@@ -253,13 +323,17 @@ document.addEventListener('DOMContentLoaded', async () => {
             const hasPermission = await requestPermissions();
             if (!hasPermission) return;
 
+            // 檢查是否有多個相機
+            const hasMultipleCameras = await getAvailableCameras();
+            switchButton.disabled = !hasMultipleCameras;
+
             // 獲取相機最佳設置
             cameraSettings = await getBestCameraSettings();
 
             // 根據不同瀏覽器設置不同的約束條件
             const constraints = {
                 video: {
-                    facingMode: 'environment',
+                    facingMode: currentFacingMode,
                     width: { exact: actualResolution?.width },
                     height: { exact: actualResolution?.height }
                 }
@@ -271,11 +345,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                     deviceId: cameraSettings.deviceId,
                     width: { exact: actualResolution?.width },
                     height: { exact: actualResolution?.height },
-                    facingMode: 'environment'
+                    facingMode: currentFacingMode
                 };
             } else if (isIOS && isSafari) {
                 constraints.video = {
-                    facingMode: 'environment',
+                    facingMode: currentFacingMode,
                     width: { exact: actualResolution?.width },
                     height: { exact: actualResolution?.height }
                 };
@@ -315,7 +389,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 await video.play();
             } catch (err) {
                 console.error('視頻播放失敗:', err);
-                // 嘗試使用舊版 API
                 video.play().catch(e => console.error('舊版播放失敗:', e));
             }
 
@@ -353,6 +426,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // 自動啟動相機
     startCamera();
+
+    // 切換相機事件
+    switchButton.addEventListener('click', switchCamera);
 
     // 拍照
     takePhotoButton.addEventListener('click', () => {
