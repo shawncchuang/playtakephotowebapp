@@ -157,38 +157,58 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 獲取相機最佳設置
     async function getBestCameraSettings() {
         try {
-            // 獲取實際分辨率
+            // 先獲取實際相機分辨率
             actualResolution = await getActualCameraResolution();
+            console.log('相機實際分辨率:', actualResolution);
 
-            // iOS Safari 特殊處理
-            if (isIOS && isSafari) {
+            // 獲取所有可用的視頻輸入設備
+            const devices = await navigator.mediaDevices.enumerateDevices();
+            const videoDevices = devices.filter(device => device.kind === 'videoinput');
+
+            if (videoDevices.length === 0) {
+                console.log('未找到相機設備');
                 return {
-                    facingMode: 'environment',
+                    deviceId: null,
                     width: actualResolution?.width || 1920,
                     height: actualResolution?.height || 1080
                 };
             }
 
-            const devices = await navigator.mediaDevices.enumerateDevices();
-            const videoDevices = devices.filter(device => device.kind === 'videoinput');
+            // 優先選擇後置相機
+            let selectedDevice = videoDevices[0];
+            for (const device of videoDevices) {
+                if (device.label.toLowerCase().includes('back') ||
+                    device.label.toLowerCase().includes('後置') ||
+                    device.label.toLowerCase().includes('rear')) {
+                    selectedDevice = device;
+                    break;
+                }
+            }
 
-            // 找到後置相機
-            const backCamera = videoDevices.find(device =>
-                device.label.toLowerCase().includes('back') ||
-                device.label.toLowerCase().includes('後置') ||
-                device.label.toLowerCase().includes('rear')
-            ) || videoDevices[0];
-
-            return {
-                deviceId: backCamera.deviceId,
-                width: actualResolution?.width || 1920,
-                height: actualResolution?.height || 1080,
-                facingMode: 'environment'
-            };
+            // 根據不同設備返回最佳設置
+            if (isIOS && isSafari) {
+                return {
+                    deviceId: selectedDevice.deviceId,
+                    width: actualResolution?.width || 1920,
+                    height: actualResolution?.height || 1080
+                };
+            } else if (isAndroid) {
+                return {
+                    deviceId: selectedDevice.deviceId,
+                    width: actualResolution?.width || 1920,
+                    height: actualResolution?.height || 1080
+                };
+            } else {
+                return {
+                    deviceId: selectedDevice.deviceId,
+                    width: actualResolution?.width || 1920,
+                    height: actualResolution?.height || 1080
+                };
+            }
         } catch (err) {
             console.error('獲取相機設置失敗:', err);
             return {
-                facingMode: 'environment',
+                deviceId: null,
                 width: actualResolution?.width || 1920,
                 height: actualResolution?.height || 1080
             };
@@ -214,19 +234,19 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
             };
 
-            // iOS Safari 特殊處理
-            if (isIOS && isSafari) {
-                constraints.video = {
-                    facingMode: 'environment',
-                    width: { exact: actualResolution?.width },
-                    height: { exact: actualResolution?.height }
-                };
-            } else {
+            // Android Chrome 特殊處理
+            if (isAndroid) {
                 constraints.video = {
                     deviceId: cameraSettings.deviceId,
                     width: { exact: actualResolution?.width },
                     height: { exact: actualResolution?.height },
                     facingMode: 'environment'
+                };
+            } else if (isIOS && isSafari) {
+                constraints.video = {
+                    facingMode: 'environment',
+                    width: { exact: actualResolution?.width },
+                    height: { exact: actualResolution?.height }
                 };
             }
 
@@ -313,6 +333,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         const ctx = canvas.getContext('2d', { alpha: false });
         ctx.imageSmoothingEnabled = true;
         ctx.imageSmoothingQuality = 'high';
+
+        // 確保使用實際分辨率繪製
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
         // 將 canvas 轉換為高質量圖片
