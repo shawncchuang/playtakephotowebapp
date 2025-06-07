@@ -32,10 +32,23 @@ document.addEventListener('DOMContentLoaded', async () => {
             controls.style.webkitBackdropFilter = 'blur(10px)';
             controls.style.transform = 'translateZ(0)';
             controls.style.webkitTransform = 'translateZ(0)';
+            controls.style.width = '100%';
+            controls.style.maxWidth = '100vw';
+            controls.style.boxSizing = 'border-box';
 
             // 適配 iOS 安全區域
             if (isIOS) {
                 controls.style.paddingBottom = 'max(15px, env(safe-area-inset-bottom))';
+            }
+
+            // 根據屏幕寬度調整間距
+            if (window.innerWidth <= 768) {
+                controls.style.gap = '10px';
+                controls.style.padding = '15px';
+            }
+            if (window.innerWidth <= 360) {
+                controls.style.gap = '8px';
+                controls.style.padding = '10px';
             }
         }
 
@@ -58,6 +71,28 @@ document.addEventListener('DOMContentLoaded', async () => {
                 button.style.position = 'relative';
                 button.style.zIndex = '10000';
                 button.style.webkitTapHighlightColor = 'transparent';
+                button.style.whiteSpace = 'nowrap';
+                button.style.overflow = 'hidden';
+                button.style.textOverflow = 'ellipsis';
+                button.style.maxWidth = '100%';
+                button.style.minWidth = '0';
+                button.style.flex = '1';
+                button.style.textAlign = 'center';
+                button.style.lineHeight = '1.2';
+
+                // 根據屏幕寬度調整按鈕大小
+                if (window.innerWidth <= 768) {
+                    button.style.padding = '12px 20px';
+                    button.style.fontSize = '14px';
+                    button.style.minWidth = '80px';
+                    button.style.maxWidth = '120px';
+                }
+                if (window.innerWidth <= 360) {
+                    button.style.padding = '10px 15px';
+                    button.style.fontSize = '12px';
+                    button.style.minWidth = '70px';
+                    button.style.maxWidth = '100px';
+                }
             }
         });
     }
